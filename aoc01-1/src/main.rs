@@ -15,13 +15,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     for line_result in reader.lines() {
         let line = line_result?;
         let line = line.trim();
+        let num = line[1..].parse::<i32>().unwrap();
+
         match line {
             s if s.starts_with("L") => {
-                let num = s[1..].parse::<i32>().unwrap();
                 counter -= num;
             }
             s if s.starts_with("R") => {
-                let num = s[1..].parse::<i32>().unwrap();
                 counter += num;
             }
             _ => panic!("should not happen"),
