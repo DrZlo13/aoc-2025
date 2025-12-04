@@ -44,6 +44,15 @@ fn get_ajanced_sum_at(field: &Vec<Vec<bool>>, x: isize, y: isize) -> u8 {
     sum
 }
 
+fn decrease_field_at(field: &mut Vec<Vec<u8>>, x: isize, y: isize) {
+    let field_height = field.len() as isize;
+    let field_width = field[0].len() as isize;
+
+    if y < field_height && x < field_width && x >= 0 && y >= 0 {
+        field[y as usize][x as usize] = field[y as usize][x as usize].saturating_sub(1);
+    }
+}
+
 fn main() -> std::io::Result<()> {
     let file_path = Path::new(INPUT_FILE);
     let line_count = file_line_count(file_path)?;
@@ -62,16 +71,37 @@ fn main() -> std::io::Result<()> {
         }
     }
 
+    // Precompute sums
+    let mut field_of_sums = vec![vec![0u8; line_width]; line_count];
+    for y in 0..line_count as isize {
+        for x in 0..line_width as isize {
+            if field[y as usize][x as usize] {
+                let ajanced_sum = get_ajanced_sum_at(&field, x, y);
+                field_of_sums[y as usize][x as usize] = ajanced_sum;
+            }
+        }
+    }
+
     let mut sum = 0;
     loop {
         let mut stage_sum = 0;
         for y in 0..line_count as isize {
             for x in 0..line_width as isize {
                 if field[y as usize][x as usize] {
-                    let ajanced_sum = get_ajanced_sum_at(&field, x, y);
+                    let ajanced_sum = field_of_sums[y as usize][x as usize];
                     if ajanced_sum < 4 {
                         stage_sum += 1;
                         field[y as usize][x as usize] = false;
+
+                        // Update sums
+                        for dy in -1..=1 {
+                            for dx in -1..=1 {
+                                if dx == 0 && dy == 0 {
+                                    continue;
+                                }
+                                decrease_field_at(&mut field_of_sums, x + dx, y + dy);
+                            }
+                        }
                     }
                 }
             }
