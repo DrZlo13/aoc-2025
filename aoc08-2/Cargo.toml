@@ -1,0 +1,7 @@
+[package]
+name = "aoc08-2"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+partitions = "0.2.4"
